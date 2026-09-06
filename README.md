@@ -1,6 +1,6 @@
 # Arcana Six
 
-Draw six cards from the Rider-Waite-Smith deck: Major Arcana, or Minor Arcana pips (Ace to Ten, no court cards). Clear, or Cleanse the deck with a blank card.
+Draw six cards from the Rider-Waite-Smith deck: Major Arcana, or Minor Arcana pips (Ace to Ten, no court cards). Clear, or Cleanse the deck.
 
 Play: https://white-hat-lab.github.io/arcana-six/
 
