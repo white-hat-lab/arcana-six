@@ -81,8 +81,7 @@
     box-shadow: inset 0 0 0 3px var(--accent);
   }
   .controls .wide { grid-column: 1 / -1; }
-  .spread.single { grid-template-columns: 1fr; justify-items: center; gap: 14px; }
-  .spread.single .card.answer { width: min(100%, 320px); }
+  .spread.single { grid-template-columns: repeat(3, 1fr); gap: 10px; }
   .card.answer { aspect-ratio: 730 / 1016; background: transparent; }
 
   .card.answer img { object-fit: contain; box-shadow: none; }
