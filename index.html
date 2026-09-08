@@ -65,6 +65,15 @@
   .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
   .btn.primary:hover { filter: brightness(1.08); }
   .btn:disabled { opacity: .45; cursor: default; }
+  .q {
+    width: 100%; font: inherit; font-size: 15px; padding: 12px 14px;
+    border: 1px solid var(--rule); border-radius: 8px; background: var(--tile); color: var(--ink);
+    -webkit-user-select: text; user-select: text;
+  }
+  .q::placeholder { color: var(--ink-3); }
+  .q:focus { outline: 2px solid var(--focus); outline-offset: 1px; border-color: var(--focus); }
+  .asked { text-align: center; font-size: 16px; font-weight: 600; color: var(--ink); padding: 2px 8px 6px; text-wrap: balance; }
+  .asked[hidden] { display: none; }
   .note { text-align: center; font-size: 13px; color: var(--ink-3); min-height: 18px; }
   .note.fool { color: var(--accent); font-weight: 600; }
   .card.joker::after {
@@ -117,6 +126,7 @@
     <button class="sty" data-style="rws">Rider-Waite</button>
     <button class="sty" data-style="marseille">Marseille</button>
   </div>
+  <input class="q" id="q" type="text" placeholder="Type your question" autocomplete="off" maxlength="140">
   <div class="controls">
     <button class="btn primary" id="major">Major</button>
     <button class="btn primary" id="minor">Minor</button>
@@ -125,6 +135,7 @@
     <button class="btn" id="cleanse">Cleanse</button>
   </div>
   <div class="note" id="note"></div>
+  <div class="asked" id="asked" hidden></div>
   <div class="spread" id="grid" aria-live="polite"></div>
 </div>
 
@@ -312,7 +323,8 @@
     return { deck: deckName, cards: deck.slice(0, 6) };
   }
   function show(spread) {
-    if (spread.deck === 'ask') return showAnswer(spread.cards);
+    if (spread.deck === 'ask') return showAnswer(spread.cards, spread.q || '');
+    $('asked').hidden = true;
     grid.classList.remove('single');
     for (let k = 0; k < 6; k++) { const c = $('card-' + k); c.hidden = false; c.classList.remove('answer'); }
     const cards = deckFor(spread.deck);
@@ -327,8 +339,10 @@
     $('note').textContent = fool ? 'The Fool turned up: the joker. Clear and ask again.' : '';
     $('note').classList.toggle('fool', fool);
   }
-  function showAnswer(picks) {
+  function showAnswer(picks, q) {
     grid.classList.add('single');
+    $('asked').textContent = q; $('asked').hidden = !q;
+    if (q && !$('q').value) $('q').value = q;
     for (let k = 0; k < 6; k++) {
       const c = $('card-' + k), img = c.querySelector('img');
       c.hidden = k >= picks.length; c.classList.remove('empty', 'joker'); c.classList.add('answer');
@@ -340,6 +354,7 @@
   }
   function clear() {
     grid.classList.remove('single');
+    $('asked').hidden = true; $('q').value = '';
     for (let k = 0; k < 6; k++) { const c = $('card-' + k); c.hidden = false; c.classList.add('empty'); c.classList.remove('answer', 'joker'); c.querySelector('img').removeAttribute('src'); }
     $('clear').disabled = true;
     $('note').classList.remove('fool');
@@ -362,7 +377,7 @@
   }
   function deal(deckName) {
     if (cleansing) return;
-    const s = deckName === 'ask' ? { deck: 'ask', cards: shuffle(ANSWERS.map((_, i) => i)).slice(0, 3) } : drawSix(deckName);
+    const s = deckName === 'ask' ? { deck: 'ask', cards: shuffle(ANSWERS.map((_, i) => i)).slice(0, 3), q: $('q').value.trim() } : drawSix(deckName);
     s.style = style;
     try { localStorage.setItem('arcana-last', JSON.stringify(s)); } catch (e) {}
     show(s);
@@ -371,6 +386,7 @@
   $('major').addEventListener('click', () => deal('major'));
   $('minor').addEventListener('click', () => deal('minor'));
   $('ask').addEventListener('click', () => deal('ask'));
+  $('q').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); $('q').blur(); deal('ask'); } });
   $('clear').addEventListener('click', () => { if (!cleansing) clear(); });
   $('cleanse').addEventListener('click', cleanse);
   document.querySelector('.styles').addEventListener('click', e => {
